@@ -10,9 +10,7 @@ setup(
   url = 'https://github.com/JesusASmx/SimpleNERtagger_ES',   # Provide either the link to your github or to your website
   download_url = 'https://github.com/JesusASmx/SimpleNERtagger_ES/archive/refs/tags/v01.tar.gz',
   keywords = ['NER', 'SPANISH', 'TAGGER'],   # Keywords that define your package best
-  install_requires=[            # En esta versión 0.1 basta con instalar re, que ya viene preinstalado por lo que ta bkn.
-          're',
-      ],
+  install_requires=[], # En esta versión 0.1 sólo se usa re, que ya viene preinstalado por lo que ta bkn.
   classifiers=[
     'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
 
