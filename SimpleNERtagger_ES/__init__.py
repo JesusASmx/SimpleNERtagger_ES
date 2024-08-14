@@ -1,1 +1,0 @@
-from SimpleNERtagger_ES.NERtagger import NER_tagger
