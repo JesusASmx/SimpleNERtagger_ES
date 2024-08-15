@@ -14,7 +14,7 @@ setup(
   classifiers=[
     'Development Status :: 4 - Beta',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
 
-    'Intended Audience :: NLP',
+    'Intended Audience :: Developers',
     'Topic :: Software Development :: Build Tools',
 
     'Programming Language :: Python :: 3.10',      #Specify which pyhton versions that you want to support
