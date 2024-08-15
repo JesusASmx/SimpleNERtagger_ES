@@ -1,6 +1,7 @@
 # SimpleNERTagger (in Spanish)
 
-by: Jesús Armenta-Segura (CIC-IPN, IFE DH&LL)
+by: [Jesús Armenta-Segura](https://jesusasmx.github.io/) ([CIC-IPN](https://cic.ipn.mx), [IFE LL&DH](https://ifelldh.tec.mx/en/data-hub))
+
 
 This is a python library who can perform named-entity recognition (NER) for spanish text. It uses the Huggingface pipeline and can leverage any model compatible with the transformers pipeline.
 
