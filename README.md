@@ -129,6 +129,11 @@ except:
   print(f"Here is the dataset with the tags:\n {all_tags}")
 ```
 
+# Citation:
+
+By using this work, you are also using the Huggingface transformer pipeline hence you are supedited to its licence. 
+If using it on a paper, you shall cite both the employed Huggingface model and this repo.
+
 # Release notes: 
 
 Releases notes only documented for versions 0.2+
