@@ -9,9 +9,9 @@ This is a python library who can perform named-entity recognition (NER) for span
 
 The Huggingface pipeline already offers a few-lines solution for deploying a NER-tagger. This library also offers the follow features:
 
-1.- Masks text with the tags obtained by the Huggingface method so it saves to you the tedious part of coding a masker. 
-2.- Returns the tags in a well-ordered DataFrame format.
-3.- It also includes two tag types not supported by the standard NER-taggers of Huggingface: telephone numbers and email addresses.
+1. Masks text with the tags obtained by the Huggingface method. Hence, it saves to you the tedious part of coding a masker. 
+2. Returns the tags in a well-ordered DataFrame format.
+3. It also includes two **tag types** not supported by the standard Huggingface NER-taggers: telephone numbers and email addresses.
 
 
 ## Usage
@@ -30,7 +30,7 @@ First, import the tagger from the library:
 from SimpleNERtagger_ES import NER_tagger
 ```
 
-Second, call the method with a path to an existing model from Huggingface. In this example, the [spanish BETO + NER](https://huggingface.co/mrm8488/bert-spanish-cased-finetuned-ner) is used
+Second, call an instance of the **NER_tagger** class with a path to an existing model from Huggingface. In this example, the [spanish BETO + NER](https://huggingface.co/mrm8488/bert-spanish-cased-finetuned-ner) is used
 
 ```
 ## You may declare a Huggingface transformer finetunned for NER.
@@ -53,18 +53,19 @@ Finally, the method who performs the NER tagging is named "NERtagging", its usag
 Here is the example of how to use it:
 
 ```
-
+## THIS IS AN EXAMPLE TEXT:
 dummy_text = """Hola Joaquín, mi nombre es Máximo Décimo Meridio, vivo en Esmirna y soy un gladiador. 
 Puedes.encontrarme.en  MDEcimoMeridio @ Colisseum-Romanorum-sanguinius.com.rome o bien en +56 23 4523 2453. 
 También le puedes dejar un mensaje a mi patrón, en el correo Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.com.rome"""
 
+## ACTUAL USAGE OF THE METHOD:
 masked_text, all_tags = tags.NERtagging(
     texto=dummy_text,
     enmascarar=True,            # Set it False for not receiving a masked version of the text.
-    mails_tag="[MAIL]",         # Tag for emails.
-    tels_tag="[TEL]",           # Tag for telephones.
-    nombres_tag="[NOMBRE]",     # Tag for names.
-    lugares_tag="[LUGAR]"       # Tag for places.
+    mails_tag="[MAIL]",         # Tag for emails. If False, avoids emails during the tagging.
+    tels_tag="[TEL]",           # Tag for telephones. If False, avoids telepehones during the tagging.
+    nombres_tag="[NOMBRE]",     # Tag for names. If False, avoids names during the tagging.
+    lugares_tag="[LUGAR]"       # Tag for places. If False, avoids places during the tagging.
     )
 
 print(masked_text)
@@ -103,7 +104,7 @@ custom_tag = ["[MAIL]",
               "[NOMBRE]",
               "[LUGAR]"]
 
-## Actual usage of the library.
+## Actual usage of the library:
 
 tags = NER_tagger(transformer)
 
@@ -122,7 +123,7 @@ masked_text, all_tags = tags.NERtagging(
 
 
 print(f"\n\nThis is the original text:\n{dummy_text}\n\nThis is the masked text:\n{masked_text}\n")
-try: # Displaying the dataframe may not work when running this code outside a jupyter notebook-like enviroment.
+try: # Displaying the dataframe may not work when running this code outside a jpnb-like enviroment.
   print("Here is the dataset with the tags:\n")
   display(all_tags)
 except:
@@ -131,8 +132,8 @@ except:
 
 # Citation:
 
-By using this work, you are also using the Huggingface transformer pipeline hence you are supedited to its licence. 
-If using it on a paper, you shall cite both the employed Huggingface model and this repo.
+By using this work, you are also using the Huggingface transformer pipeline. Hence, you are supedited to its licence. 
+If using this work for/on a paper, you must cite both the employed Huggingface model and this repo.
 
 # Release notes: 
 
