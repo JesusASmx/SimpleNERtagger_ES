@@ -7,7 +7,7 @@ This is a python library who can perform named-entity recognition (NER) for span
 
 ### Why using this library?
 
-The Huggingface pipeline already offers a few-lines solution for deploying a NER-tagger. This library also offers the follow features:
+The Huggingface pipeline already offers several few-lines solutions for deploying a NER-tagger. This library also offers the follow features:
 
 1. Masks text with the tags obtained by the Huggingface method. Hence, it saves to you the tedious part of coding a masker. 
 2. Returns the tags in a well-ordered DataFrame format.
