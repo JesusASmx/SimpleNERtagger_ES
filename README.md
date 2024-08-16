@@ -39,7 +39,7 @@ transformer = "mrm8488/bert-spanish-cased-finetuned-ner"
 tags = NER_tagger(transformer)
 ```
 
-If you declare a non-existing model, or it is not suitable for NER-tagging, or just do not declare any model, the library will not load any transformer and hence will only tag emails and telephones.
+**IMPORTANT:** If you declare a non-existing model, or it is not suitable for NER-tagging, or just do not declare any model, the library will not load any transformer and hence will only tag emails and telephones.
   
 
 Third, to perform the NER tagging over a text (in this case, a dummy text), it is necessary to define the tags. Currently (v0.2), this library supports four kinds of tags: emails, telephone numbers, names and locations.
