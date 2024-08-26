@@ -125,9 +125,6 @@ class NER_tagger:
     # Variables referenciadas dentro de todos los procesos de etiquetamiento:
     self.separate_tags = unir_tags_iguales # Esto fue un error de dislexia. En un universo paralelo yo nombré esta variable self.unir_tags_iguales.
 
-    final_texto = texto
-
-
     if mails_tag:
       mail_tags = self.tag_emails(texto, str(mails_tag))
     else: #AÑADIR EN LA DOCUMENTACIÓN: Aguas con poner como falso la detección de un tag: será pasado por alto por el algoritmo, pudiendo detectar webs de correos como nombres o lugares.
@@ -152,10 +149,10 @@ class NER_tagger:
     else:
       trans_tags = {'tag':[], 'palabra':[], 'start':[],'end':[]}
 
-    all_tags = {'tag':mail_tags['tag']+tel_tags['tag']+trans_tags['tag'],                 #+nom_tags['tag']+lug_tags['tag'],
-                'palabra':mail_tags['palabra']+tel_tags['palabra']+trans_tags['palabra'], #+nom_tags['palabra']+lug_tags['palabra'],
-                'start':mail_tags['start']+tel_tags['start']+trans_tags['start'],         #+nom_tags['start']+lug_tags['start'],
-                'end':mail_tags['end']+tel_tags['end']+trans_tags['end']}                 #+nom_tags['end']+lug_tags['end']}
+    all_tags = {'tag':[]+mail_tags['tag']+tel_tags['tag']+trans_tags['tag'],                 #+nom_tags['tag']+lug_tags['tag'],
+                'palabra':[]+mail_tags['palabra']+tel_tags['palabra']+trans_tags['palabra'], #+nom_tags['palabra']+lug_tags['palabra'],
+                'start':[]+mail_tags['start']+tel_tags['start']+trans_tags['start'],         #+nom_tags['start']+lug_tags['start'],
+                'end':[]+mail_tags['end']+tel_tags['end']+trans_tags['end']}                 #+nom_tags['end']+lug_tags['end']}
 
     all_tags = pd.DataFrame(all_tags).sort_values(by=['start']).reset_index().drop(["index"], axis=1)
 
@@ -179,8 +176,7 @@ class NER_tagger:
 
       all_tags = all_tags.drop(to_drop)
 
-
-    all_tags = all_tags[all_tags["palabra"].str.len() > 1].reset_index().drop(["index"], axis=1) # Sólo conservar palabras con más de 1 caracter.
+    all_tags = all_tags[all_tags["palabra"].astype(str).str.len() > 1].reset_index().drop(["index"], axis=1) # Sólo conservar palabras con más de 1 caracter.
 
     # Tiempo de remover tags solapados. E.g. Juanito@Tokio.jp tiene los tags [NOMBRE]@[LUGAR].jp y [MAIL] al mismo tiempo
     jerarquia = {str(mails_tag):3, str(tels_tag):2, str(nombres_tag):1, str(lugares_tag):0} # Añadir a futuras versiones la posibilidad de manipular este orden.
@@ -198,11 +194,13 @@ class NER_tagger:
 
 
     # Enmascarar
+    masked_texto = texto
     if len(all_tags) > 0:
-      masked_texto  = final_texto[:all_tags['start'][0]] + all_tags['tag'][0]
+      masked_texto  = texto[:all_tags['start'][0]] + all_tags['tag'][0]
       for x in range(len(all_tags)-1):
-        masked_texto += final_texto[all_tags['end'][x]:all_tags['start'][x+1]] + all_tags['tag'][x+1]
-
-      masked_texto += final_texto[all_tags['end'][len(all_tags)-1]:]
+        masked_texto += texto[all_tags['end'][x]:all_tags['start'][x+1]] + all_tags['tag'][x+1]
+      masked_texto += texto[all_tags['end'][len(all_tags)-1]:]
+    #else:
+      #print("ADVERTENCIA: No se encontraron entidades nombradas. Se regresa el texto original y un DataFrame vacío.")
 
     return masked_texto, all_tags
