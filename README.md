@@ -82,19 +82,18 @@ print(all_tags)
 This returns the string ```masked_text``` with the tagged text, and the pandas dataframe ```all_tags``` with all the tagged words (columns are "tag", "palabra" -word in spanish-, "start" and "end"). In this case:
 
 ```
-Hola [NOMBRE], mi nombre es [NOMBRE] [NOMBRE] [NOMBRE], vivo en [LUGAR] y soy un gladiador. 
+Hola [NOMBRE], mi nombre es [NOMBRE], vivo en [LUGAR] y soy un gladiador. 
 Puedes.encontrarme.en  [MAIL] o bien en[TEL]. 
-También le puedes dejar un mensaje a mi patrón, en el correo [MAIL]
+También le puedes dejar un mensaje a mi patrón, en el correo [MAIL], 
+lo cual muestra que somos una gran familia.
 
-  tag        palabra	                                              start	end
-0	[NOMBRE]  Joaquín	                                          5	12
-1	[NOMBRE]	Máximo	                                          27	33
-2	[NOMBRE]	Décimo	                                          34	40
-3	[NOMBRE]	Meridio	                                          41	48
-4	[LUGAR]	  Esmirna	                                          58	65
-5	[MAIL]	  MDEcimoMeridio @ Colisseum-Romanorum-sanguiniu...      110	166
-6	[TEL]	    +56 23 4523 2453	                                  176	193
-7	[MAIL]	  Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.c...      257	310
+        tag                                            palabra  start  end
+0  [NOMBRE]                                            Joaquín      5   12
+1  [NOMBRE]                              Máximo Décimo Meridio     27   48
+2   [LUGAR]                                            Esmirna     58   65
+3    [MAIL]  MDEcimoMeridio @ Colisseum-Romanorum-sanguiniu...    110  166
+4     [TEL]                                   +56 23 4523 2453    176  193
+5    [MAIL]  Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.c...    257  310
 ```
 
 As a toy example, consider this full snipet who unifies all the previous explanation:
@@ -117,7 +116,8 @@ tags = NER_tagger(transformer)
 
 dummy_text = """Hola Joaquín, mi nombre es Máximo Décimo Meridio, vivo en Esmirna y soy un gladiador. 
 Puedes.encontrarme.en  MDEcimoMeridio @ Colisseum-Romanorum-sanguinius.com.rome o bien en +56 23 4523 2453. 
-También le puedes dejar un mensaje a mi patrón, en el correo Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.com.rome"""
+También le puedes dejar un mensaje a mi patrón, en el correo Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.com.rome, 
+lo cual muestra que somos una gran familia."""
 
 masked_text, all_tags = tags.NERtagging(
     texto=dummy_text,
