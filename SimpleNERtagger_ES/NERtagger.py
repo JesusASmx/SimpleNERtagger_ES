@@ -177,7 +177,6 @@ class NER_tagger:
         else:
           inicier = min(x+1,len(all_tags))
 
-      display(all_tags)
       all_tags = all_tags.drop(to_drop)
 
 
