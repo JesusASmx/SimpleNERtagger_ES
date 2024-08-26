@@ -1,4 +1,4 @@
-# SimpleNERTagger (in Spanish)
+# SimpleNERTagger (for Spanish)
 
 by: [Jesús Armenta-Segura](https://jesusasmx.github.io/) ([CIC-IPN](https://cic.ipn.mx), [IFE LL&DH](https://ifelldh.tec.mx/en/data-hub))
 
@@ -20,7 +20,7 @@ The Huggingface pipeline already offers several few-lines solutions for deployin
 !pip install SimpleNERtagger-ES
 
 #For updating, use this instead (and comment the first one xD):
-#!pip install SimpleNERtagger-ES-U
+#!pip install SimpleNERtagger-ES --upgrade
 ```
 
 For now, only pip is supported for the installation. You can still fork this repo if needed.
@@ -39,18 +39,19 @@ Second, call an instance of the **NER_tagger** class with a path to an existing 
 ## You may declare a Huggingface transformer finetunned for NER.
 transformer = "mrm8488/bert-spanish-cased-finetuned-ner"
 
+## Hence, call the instance.
 tags = NER_tagger(transformer)
 ```
 
 **IMPORTANT:** If you declare a non-existing model, or it is not suitable for NER-tagging, or you just do not declare a model, the library will not load a transformer and hence will only can tag emails and telephones.
   
 
-Third, to perform the NER tagging over a text (in this case, a dummy text), it is necessary to define the tags. Currently (v0.2), this library supports four kinds of tags: emails, telephone numbers, names and locations.
+Third, to perform the NER tagging over a text (in this case, a dummy text), it is necessary to define the tags. Currently (v0.2+), this library supports four kinds of tags: emails, telephone numbers, names and locations and it is not sensitive to the BIO notation.
 
 Finally, the method who performs the NER tagging is named "NERtagging", its usage is straightforward and requires the follow arguments:
 
 - ```texto```  The text to be tagged.
-* ```unir_tags_iguales``` Means "join_equal_tags" in english. If True, all contiguous tags will be unified as one. For instance, "Juán Pérez" represents two contiguous name tags.
+* ```unir_tags_iguales``` Means "join_equal_tags" in english. If True, all contiguous tags will be unified as one. For instance, "Juán Pérez" can represent two contiguous name tags if ```unir_tags_iguales=False```.
 + ```mails_tag``` The tag fot the email. Set it False for ignoring emails during the tagging.
 + ```tels_tag``` The tag fot the telephone numbers. Set it False for ignoring tel numbers during the tagging.
 + ```nombres_tag``` The tag fot the names. Set it False for ignoring names during the tagging.
@@ -146,15 +147,13 @@ Perhaps you may want to use it for masking text over the rows of a DataFrame. On
 
 import pandas as pd
 
-#This is a datasets for spanish jokes. The texts are stored into a column named "text".
-df = pd.read_parquet("hf://datasets/mrm8488/CHISTES_spanish_jokes/data/train-00000-of-00001-b70fa6139e8c3f32.parquet")
+#This is a datasets for spanish jokes. The texts are stored into a column named "text". We consider only the first 100 as an example.
+df = pd.read_parquet("hf://datasets/mrm8488/CHISTES_spanish_jokes/data/train-00000-of-00001-b70fa6139e8c3f32.parquet").head(100)
 
-
-## We load the tagger:
-
-from SimpleNERtagger_ES import NER_tagger
 
 ## Method initialization:
+from SimpleNERtagger_ES import NER_tagger
+
 transformer = "mrm8488/bert-spanish-cased-finetuned-ner"
 custom_tag = ["[MAIL]",
               "[TEL]",
@@ -163,6 +162,8 @@ custom_tag = ["[MAIL]",
 
 tags = NER_tagger(transformer)
 
+
+## How to use the method in that pandas dataframe:
 
 from tqdm import tqdm # In some cases you might want to run "!pip install tqdm" first.
 
