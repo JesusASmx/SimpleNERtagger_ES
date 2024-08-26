@@ -168,7 +168,6 @@ class NER_tagger:
         if all_tags['tag'][x] == all_tags['tag'][min(x+1,len(all_tags)-1)] and all_tags['end'][x] == all_tags['start'][min(x+1,len(all_tags)-1)]-1: # Tiene sentido iniciar el algoritmo de unificación.
           la_palabra += ' '+all_tags['palabra'][x]
           to_drop.append(min(x+1,len(all_tags)))
-          print(la_palabra, inicier)
         elif len(la_palabra)>0:
           all_tags.loc[inicier, 'palabra'] = la_palabra + ' '+all_tags['palabra'][x]
           all_tags.loc[inicier, 'end'] = all_tags['end'][x]
