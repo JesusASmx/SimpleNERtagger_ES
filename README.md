@@ -18,6 +18,9 @@ The Huggingface pipeline already offers several few-lines solutions for deployin
 
 ```
 !pip install SimpleNERtagger-ES
+
+#For updating, use this instead (and comment the first one xD):
+#!pip install SimpleNERtagger-ES-U
 ```
 
 For now, only pip is supported for the installation. You can still fork this repo if needed.
@@ -47,7 +50,7 @@ Third, to perform the NER tagging over a text (in this case, a dummy text), it i
 Finally, the method who performs the NER tagging is named "NERtagging", its usage is straightforward and requires the follow arguments:
 
 - ```texto```  The text to be tagged.
-* ```enmascarar``` Means "to mask" in english. Set it False for not receiving a masked version of the text.
+* ```unir_tags_iguales``` Means "join_equal_tags" in english. If True, all contiguous tags will be unified as one. For instance, "Juán Pérez" represents two contiguous name tags.
 + ```mails_tag``` The tag fot the email. Set it False for ignoring emails during the tagging.
 + ```tels_tag``` The tag fot the telephone numbers. Set it False for ignoring tel numbers during the tagging.
 + ```nombres_tag``` The tag fot the names. Set it False for ignoring names during the tagging.
@@ -59,12 +62,13 @@ Here is the example of how to use it:
 ## THIS IS AN EXAMPLE TEXT:
 dummy_text = """Hola Joaquín, mi nombre es Máximo Décimo Meridio, vivo en Esmirna y soy un gladiador. 
 Puedes.encontrarme.en  MDEcimoMeridio @ Colisseum-Romanorum-sanguinius.com.rome o bien en +56 23 4523 2453. 
-También le puedes dejar un mensaje a mi patrón, en el correo Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.com.rome"""
+También le puedes dejar un mensaje a mi patrón, en el correo Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.com.rome, 
+lo cual muestra que somos una gran familia."""
 
 ## ACTUAL USAGE OF THE METHOD:
 masked_text, all_tags = tags.NERtagging(
     texto=dummy_text,
-    enmascarar=True,            # Set it False for not receiving a masked version of the text.
+    unir_tags_iguales=True,     # Set it False for convert "Maximo Décimo Meridio" into [NOMBRE] [NOMBRE] [NOMBRE] rather than a single [NOMBRE].
     mails_tag="[MAIL]",         # Tag for emails. If False, avoids emails during the tagging.
     tels_tag="[TEL]",           # Tag for telephones. If False, avoids telepehones during the tagging.
     nombres_tag="[NOMBRE]",     # Tag for names. If False, avoids names during the tagging.
@@ -117,7 +121,7 @@ También le puedes dejar un mensaje a mi patrón, en el correo Comodo.Joffrey@Co
 
 masked_text, all_tags = tags.NERtagging(
     texto=dummy_text,
-    enmascarar=True,            # Set it False for not receiving a masked version of the text.
+    unir_tags_iguales=True,     # Set it False for convert "Maximo Décimo Meridio" into [NOMBRE] [NOMBRE] [NOMBRE] rather than a single [NOMBRE].
     mails_tag=custom_tag[0],    # Tag for emails.
     tels_tag=custom_tag[1],     # Tag for telephones.
     nombres_tag=custom_tag[2],  # Tag for names.
@@ -133,11 +137,74 @@ except:
   print(f"Here is the dataset with the tags:\n {all_tags}")
 ```
 
+### Bonus: using this NER-tagger in a Pandas Dataframe
+
+Perhaps you may want to use it for masking text over the rows of a DataFrame. On that case, the use is straightforward:
+
+```
+## Suppose that you use a HuggingFace dataset:
+
+import pandas as pd
+
+#This is a datasets for spanish jokes. The texts are stored into a column named "text".
+df = pd.read_parquet("hf://datasets/mrm8488/CHISTES_spanish_jokes/data/train-00000-of-00001-b70fa6139e8c3f32.parquet")
+
+
+## We load the tagger:
+
+from SimpleNERtagger_ES import NER_tagger
+
+## Method initialization:
+transformer = "mrm8488/bert-spanish-cased-finetuned-ner"
+custom_tag = ["[MAIL]",
+              "[TEL]",
+              "[NOMBRE]",
+              "[LUGAR]"]
+
+tags = NER_tagger(transformer)
+
+
+from tqdm import tqdm # In some cases you might want to run "!pip install tqdm" first.
+
+tqdm.pandas(desc="Añadiendo NER tags y enmascarando") #tqdm is only for showing a nice progress bar.
+
+df["NER_tagged_text], its_tags = zip(*df["text"].progress_apply(lambda x: tags.NERtagging(
+                                                            texto=x,
+                                                            unir_tags_iguales=True,
+                                                            mails_tag=custom_tag[0],
+                                                            tels_tag=custom_tag[1],
+                                                            nombres_tag=custom_tag[2],
+                                                            lugares_tag=custom_tag[3]
+                                                            )[0]
+                                                ))
+
+#This is the column with the tagged texts:
+try:
+  display(df["NER_tagged_text])
+except:
+  print(df["NER_tagged_text])
+
+#The diverse dataframes with the tags are stored in the variable "its_tags".
+for all_tags in its_tags: #WARNING: Output may be ludicrously humongous.
+  try:
+    display(all_tags)
+  except:
+    print(all_tags)
+```
+
+
 # Citation:
 
 By using this work, you are also using the Huggingface transformer pipeline. Hence, you are supedited to its licence. 
 If using this work for/on a paper, you must cite both the employed Huggingface model and this repo.
 
-# Release notes: 
+# Release notes and changelogs: 
 
 Releases notes only documented for versions 0.2+
+
+### Version 0.2
+
+- Fixed the problem of not retrieving the text after the last tag.
+- Argument "enmascarar" removed for being redundant (if you want an unmasked text, just do not overwrite the "texto" variable), and substituted by the argument "unir_tags_iguales".
+- Function "tag_transformers" optimized.
+- Method "NERtagging" optimized.
