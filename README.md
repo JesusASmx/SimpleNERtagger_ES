@@ -150,7 +150,6 @@ import pandas as pd
 #This is a datasets for spanish jokes. The texts are stored into a column named "text". We consider only the first 100 as an example.
 df = pd.read_parquet("hf://datasets/mrm8488/CHISTES_spanish_jokes/data/train-00000-of-00001-b70fa6139e8c3f32.parquet").head(100)
 
-
 ## Method initialization:
 from SimpleNERtagger_ES import NER_tagger
 
@@ -165,31 +164,34 @@ tags = NER_tagger(transformer)
 
 ## How to use the method in that pandas dataframe:
 
-from tqdm import tqdm # In some cases you might want to run "!pip install tqdm" first.
+from tqdm import tqdm # In some cases you might want to run "!pip install tqdm" first. tqdm is only for showing a nice progress bar.
+tqdm.pandas(desc="Añadiendo NER tags y enmascarando")
 
-tqdm.pandas(desc="Añadiendo NER tags y enmascarando") #tqdm is only for showing a nice progress bar.
 
-df["NER_tagged_text], its_tags = zip(*df["text"].progress_apply(lambda x: tags.NERtagging(
-                                                            texto=x,
-                                                            unir_tags_iguales=True,
-                                                            mails_tag=custom_tag[0],
-                                                            tels_tag=custom_tag[1],
-                                                            nombres_tag=custom_tag[2],
-                                                            lugares_tag=custom_tag[3]
-                                                            )[0]
-                                                ))
+## If you want to remove tqdm, just change ".progress_apply" to ".apply".
+## Recall that NERtagging has two outputs: the masked text and a dataframe with the tags. The use of zip allow us to generate the
+## new column with the masked texts, but also to store back into "its_tags" the dataframes with the tags, which are ordered
+## like the rows (e.g. the kth element of "its_tags" corresponds to the tag dataframe for the kth row. It is not in terms of the index)
+df["NER_tagged_text"], its_tags = zip(*df["text"].progress_apply(lambda x: tags.NERtagging(texto=x, 
+                                                                                           unir_tags_iguales=True, 
+                                                                                           mails_tag=custom_tag[0], 
+                                                                                           tels_tag=custom_tag[1], 
+                                                                                           nombres_tag=custom_tag[2], 
+                                                                                           lugares_tag=custom_tag[3])))
 
 #This is the column with the tagged texts:
 try:
-  display(df["NER_tagged_text])
+  display(df[["text", "NER_tagged_text"]])
 except:
-  print(df["NER_tagged_text])
+  print(df[["text", "NER_tagged_text"]])
 
 #The diverse dataframes with the tags are stored in the variable "its_tags".
-for all_tags in its_tags: #WARNING: Output may be ludicrously humongous.
+for count, all_tags in enumerate(its_tags): #WARNING: Output may be ludicrously humongous.
   try:
+    print(f"\nRow {count}:")
     display(all_tags)
   except:
+    print(f"\nRow {count}:")
     print(all_tags)
 ```
 
