@@ -157,7 +157,7 @@ Second, initialize the methods (such as in the previous example):
 Third, run the tagger over all rows by using the ```lambda``` function and the ```progress_apply``` pandas' method. 
 Recall that ```tags.NERtagging(**args)``` returns two values: the masked text and the dataframe with the tags. In order to store the masked texts into a new column, while setting apart the dataframes at the same time, we can use the ```zip(*)``` function to do so:
 ```
->>> from tqdm import tqdm # In some envoroment you should want to run "!pip install tqdm" first. 
+>>> from tqdm import tqdm # In some envoroments you should want to run "!pip install tqdm" first. 
 >>> tqdm.pandas(desc="Añadiendo NER tags y enmascarando") #tqdm is only for showing a nice progress bar.
 >>> df["NER_tagged_text"], its_tags = zip(*df["text"].progress_apply(lambda x: tags.NERtagging(texto=x, 
                                                                                            unir_tags_iguales=True, 
