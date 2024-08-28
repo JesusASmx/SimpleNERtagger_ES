@@ -230,9 +230,9 @@ If using this work for/on a paper, you must cite both the employed Huggingface m
 
 # Release notes and changelogs: 
 
-Releases notes only documented for versions 0.2+
+_Releases notes only documented for versions 2+_
 
-### Version 0.2
+### Version 2.3
 
 - Fixed the problem of not retrieving the text after the last tag.
 - Argument "enmascarar" removed for being redundant (if you want an unmasked text, just do not overwrite the "texto" variable), and substituted by the argument "unir_tags_iguales".
