@@ -17,10 +17,12 @@ The Huggingface pipeline already offers several few-lines solutions for deployin
 ## Usage
 
 ```
-!pip install SimpleNERtagger-ES
+>>> !pip install SimpleNERtagger-ES
+```
 
-#For updating, use this instead (and comment the first one xD):
-#!pip install SimpleNERtagger-ES --upgrade
+For updating into a the latest version, use this instead:
+```
+>>> !pip install SimpleNERtagger-ES --upgrade
 ```
 
 For now, only pip is supported for the installation. You can still fork this repo if needed.
@@ -30,25 +32,22 @@ For now, only pip is supported for the installation. You can still fork this rep
 First, import the tagger from the library:
 
 ```
-from SimpleNERtagger_ES import NER_tagger
+>>> from SimpleNERtagger_ES import NER_tagger
 ```
 
-Second, call an instance of the **NER_tagger** class with a path to an existing model from Huggingface. In this example, the [spanish BETO + NER](https://huggingface.co/mrm8488/bert-spanish-cased-finetuned-ner) is used
+Second, call an instance of the **NER_tagger** class with a path to an existing model from Huggingface. In this example, the [spanish BETO + NER](https://huggingface.co/mrm8488/bert-spanish-cased-finetuned-ner) is used. In general, you may declare a Huggingface transformer finetunned for NER.
 
 ```
-## You may declare a Huggingface transformer finetunned for NER.
-transformer = "mrm8488/bert-spanish-cased-finetuned-ner"
-
-## Hence, call the instance.
-tags = NER_tagger(transformer)
+>>> transformer = "mrm8488/bert-spanish-cased-finetuned-ner"
+>>> tags = NER_tagger(transformer)
 ```
 
 **IMPORTANT:** If you declare a non-existing model, or it is not suitable for NER-tagging, or you just do not declare a model, the library will not load a transformer and hence will only can tag emails and telephones.
   
 
-Third, to perform the NER tagging over a text (in this case, a dummy text), it is necessary to define the tags. Currently (v0.2+), this library supports four kinds of tags: emails, telephone numbers, names and locations and it is not sensitive to the BIO notation.
+Third, to perform the NER tagging over a text (in this case, a dummy text), it is necessary to define the tags. Currently (v0.2+), this library supports four kinds of tags: emails, telephone numbers, names and locations and it is not sensitive to the BIO notation since it only considers complete words.
 
-Finally, the method who performs the NER tagging is named "NERtagging", its usage is straightforward and requires the follow arguments:
+Finally, the method who performs the NER tagging is named "NERtagging", its usage is straightforward and it requires the follow arguments:
 
 - ```texto```  The text to be tagged.
 * ```unir_tags_iguales``` Means "join_equal_tags" in english. If True, all contiguous tags will be unified as one. For instance, "Juán Pérez" can represent two contiguous name tags if ```unir_tags_iguales=False```.
@@ -60,33 +59,33 @@ Finally, the method who performs the NER tagging is named "NERtagging", its usag
 Here is the example of how to use it:
 
 ```
-## THIS IS AN EXAMPLE TEXT:
-dummy_text = """Hola Joaquín, mi nombre es Máximo Décimo Meridio, vivo en Esmirna y soy un gladiador. 
+>>> dummy_text = """Hola Joaquín, mi nombre es Máximo Décimo Meridio, vivo en Esmirna y soy un gladiador. 
 Puedes.encontrarme.en  MDEcimoMeridio @ Colisseum-Romanorum-sanguinius.com.rome o bien en +56 23 4523 2453. 
 También le puedes dejar un mensaje a mi patrón, en el correo Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.com.rome, 
 lo cual muestra que somos una gran familia."""
 
-## ACTUAL USAGE OF THE METHOD:
-masked_text, all_tags = tags.NERtagging(
-    texto=dummy_text,
-    unir_tags_iguales=True,     # Set it False for convert "Maximo Décimo Meridio" into [NOMBRE] [NOMBRE] [NOMBRE] rather than a single [NOMBRE].
-    mails_tag="[MAIL]",         # Tag for emails. If False, avoids emails during the tagging.
-    tels_tag="[TEL]",           # Tag for telephones. If False, avoids telepehones during the tagging.
-    nombres_tag="[NOMBRE]",     # Tag for names. If False, avoids names during the tagging.
-    lugares_tag="[LUGAR]"       # Tag for places. If False, avoids places during the tagging.
-    )
-
-print(masked_text)
-print(all_tags)
+>>> masked_text, all_tags = tags.NERtagging(
+      texto=dummy_text,
+      unir_tags_iguales=True,     # Set it False for convert "Maximo Décimo Meridio" into [NOMBRE] [NOMBRE] [NOMBRE] rather than a single [NOMBRE].
+      mails_tag="[MAIL]",         # Tag for emails. If False, avoids emails during the tagging.
+      tels_tag="[TEL]",           # Tag for telephones. If False, avoids telepehones during the tagging.
+      nombres_tag="[NOMBRE]",     # Tag for names. If False, avoids names during the tagging.
+      lugares_tag="[LUGAR]"       # Tag for places. If False, avoids places during the tagging.
+      )
 ```
 
-This returns the string ```masked_text``` with the tagged text, and the pandas dataframe ```all_tags``` with all the tagged words (columns are "tag", "palabra" -word in spanish-, "start" and "end"). In this case:
+```tags.NERtagging(*args)``` returns the string ```masked_text```, which is the input text but tagged, and the pandas dataframe ```all_tags```, which contains all the tagged words (columns are "tag", "palabra" -word in spanish-, "start" and "end") in an ordered fashion. In this case:
 
 ```
+>>> print(masked_text)
+
 Hola [NOMBRE], mi nombre es [NOMBRE], vivo en [LUGAR] y soy un gladiador. 
 Puedes.encontrarme.en  [MAIL] o bien en[TEL]. 
 También le puedes dejar un mensaje a mi patrón, en el correo [MAIL], 
 lo cual muestra que somos una gran familia.
+```
+```
+>>> print(all_tags)
 
         tag                                            palabra  start  end
 0  [NOMBRE]                                            Joaquín      5   12
@@ -97,7 +96,7 @@ lo cual muestra que somos una gran familia.
 5    [MAIL]  Comodo.Joffrey@Colisseum-Romanorum.Exec.Boss.c...    257  310
 ```
 
-As a toy example, consider this full snipet who unifies all the previous explanation:
+As a toy example, consider this full snipet.py who unifies all the previous procedure into a single script:
 
 ```
 from SimpleNERtagger_ES import NER_tagger
@@ -138,10 +137,38 @@ except:
   print(f"Here is the dataset with the tags:\n {all_tags}")
 ```
 
-### Bonus: using this NER-tagger in a Pandas Dataframe
+### BONUS: using this NER-tagger in a Pandas Dataframe
 
 Perhaps you may want to use it for masking text over the rows of a DataFrame. On that case, the use is straightforward:
 
+First, get your dataframe. As a toy example, consider this [HuggingFace dataset for spanish jokes](https://huggingface.co/datasets/mrm8488/CHISTES_spanish_jokes) (we take only the 100 first samples):
+```
+>>> import pandas as pd
+>>> df = pd.read_parquet("hf://datasets/mrm8488/CHISTES_spanish_jokes/data/train-00000-of-00001-b70fa6139e8c3f32.parquet").head(100)
+```
+
+Second, initialize the methods (such as in the previous example):
+```
+>>> from SimpleNERtagger_ES import NER_tagger
+>>> transformer = "mrm8488/bert-spanish-cased-finetuned-ner"
+>>> tags = NER_tagger(transformer)
+```
+
+Third, run the tagger over all rows by using the ```lambda``` function and the ```progress_apply``` pandas' method. 
+Recall that ```tags.NERtagging(**args)``` returns two values: the masked text and the dataframe with the tags. In order to store the masked texts into a new column, while setting apart the dataframes at the same time, we can use the ```zip(*)``` function to do so:
+```
+>>> from tqdm import tqdm # In some envoroment you should want to run "!pip install tqdm" first. 
+>>> tqdm.pandas(desc="Añadiendo NER tags y enmascarando") #tqdm is only for showing a nice progress bar.
+>>> df["NER_tagged_text"], its_tags = zip(*df["text"].progress_apply(lambda x: tags.NERtagging(texto=x, 
+                                                                                           unir_tags_iguales=True, 
+                                                                                           mails_tag="[MAIL]", 
+                                                                                           tels_tag="[TEL]", 
+                                                                                           nombres_tag="[NOMBRE]", 
+                                                                                           lugares_tag="[LUGAR]")))
+```
+WARNING: Output might be ludicrously humongous.
+
+Here is a full script who contains all the previous explanation:
 ```
 ## Suppose that you use a HuggingFace dataset:
 
