@@ -8,7 +8,7 @@ setup(
   author = 'Jesús Armenta-Segura',                   # Type in your name
   author_email = 'jesus.jorge.armenta@gmail.com',      # Type in your E-Mail
   url = 'https://github.com/JesusASmx/SimpleNERtagger_ES',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/JesusASmx/SimpleNERtagger_ES/archive/refs/tags/v023.tar.gz',
+  download_url = 'https://github.com/JesusASmx/SimpleNERtagger_ES/archive/refs/tags/v024.tar.gz',
   keywords = ['NER', 'SPANISH', 'TAGGER'],   # Keywords that define your package best
   install_requires=['pandas', 'transformers'], # En esta versión 0.2 ya se incluyen màs requisitos.
   classifiers=[
