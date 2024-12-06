@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'SimpleNERtagger_ES',         # How you named your package folder (MyLib)
   packages = ['SimpleNERtagger_ES'],   # Chose the same as "name"
-  version = '0.24',      # Start with a small number and increase it with every change you make
+  version = '0.25',      # Start with a small number and increase it with every change you make
   license='',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'This is an on-development NER-tagger in spanish. Regardless other NER-taggers in the market/wilds/Huggingface, this one will include non-common tags. Also, it will work with three kind of methods at the same time: deterministic and based on regular expressions (v0.1), transformer-based fine-tunned over preexisting data (v0.2) and LLM-prompt-based leveraging few-shot learning techniques (v0.3).',   # Give a short description about your library
   author = 'Jesús Armenta-Segura',                   # Type in your name
