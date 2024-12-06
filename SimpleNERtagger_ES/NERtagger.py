@@ -31,7 +31,7 @@ class NER_tagger:
     ## PASO 1: Los taggers usuales regresan tags en el formato BIO.
     dict_tags = []
     for targ in dict_tag:
-      dict_tags += [{'tag':targ, 'palabra':x['word'], 'start':x['start'],'end':x['end'], 'index':x['index']} for x in self.tags if x['entity'] in dict_tag[targ]] # self.tags se define en otras funciones, y consiste en el resultado del BERT-NERTagger ya ejecutado sobre el texto.
+      dict_tags += [{'tag':targ, 'palabra':x['word'], 'start':x['start'],'end':x['end'], 'index':x['index']} for x in self.tags if x['entity_group'] in dict_tag[targ]] # self.tags se define en otras funciones, y consiste en el resultado del BERT-NERTagger ya ejecutado sobre el texto.
 
     dict_tags = sorted(dict_tags, key=lambda x: x["index"]) #Ordenados por orden de aparición.
 
