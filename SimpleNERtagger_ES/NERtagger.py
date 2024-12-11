@@ -55,7 +55,7 @@ class NER_tagger:
       for x in to_delete:
         dict_tags.remove(x)
     except:
-      self.tags = self.alt_nlp(texto)
+      self.tags = self.alt_nlp(text)
       dict_tags = []
       for targ in dict_tag:
         dict_tags += [{'tag':targ, 'palabra':x['word'], 'start':x['start'],'end':x['end'], 'index':x['index']} for x in self.tags if x['entity_group'] in dict_tag[targ]] # self.tags se define en otras funciones, y consiste en el resultado del BERT-NERTagger ya ejecutado sobre el texto.
