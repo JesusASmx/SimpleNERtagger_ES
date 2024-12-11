@@ -15,7 +15,8 @@ class NER_tagger:
       try:
         self.tokenizer = AutoTokenizer.from_pretrained(self.transformer)
         self.model = AutoModelForTokenClassification.from_pretrained(self.transformer)
-        self.nlp = pipeline("ner", model=self.model, tokenizer=self.tokenizer, aggregation_strategy="average") #V2.4 añade aggregation strategy para ya no utilizar el algoritmo raro de reunificación de tokens.
+        self.nlp = pipeline("ner", model=self.model, tokenizer=self.tokenizer)#, aggregation_strategy="average") #V2.4 añade aggregation strategy para ya no utilizar el algoritmo raro de reunificación de tokens.
+        self.alt_nlp = pipeline("ner", model=self.model, tokenizer=self.tokenizer, aggregation_strategy="average")
         print(f"\nTransformer cargado: {self.transformer}")
       except:
         print(f"\nError al cargar el transformer {self.transformer}, se procederá sin transformer (no se marcarán ni nombres ni lugares)")
@@ -31,27 +32,34 @@ class NER_tagger:
     ## PASO 1: Los taggers usuales regresan tags en el formato BIO.
     dict_tags = []
     for targ in dict_tag:
-      dict_tags += [{'tag':targ, 'palabra':x['word'], 'start':x['start'],'end':x['end'], 'index':x['index']} for x in self.tags if x['entity_group'] in dict_tag[targ]] # self.tags se define en otras funciones, y consiste en el resultado del BERT-NERTagger ya ejecutado sobre el texto.
+      dict_tags += [{'tag':targ, 'palabra':x['word'], 'start':x['start'],'end':x['end'], 'index':x['index']} for x in self.tags if x['entity'] in dict_tag[targ]] # self.tags se define en otras funciones, y consiste en el resultado del BERT-NERTagger ya ejecutado sobre el texto.
 
     dict_tags = sorted(dict_tags, key=lambda x: x["index"]) #Ordenados por orden de aparición.
 
     ##### V2.4 utiliza aggregation_strat=Average, lo que hace que esto ya no sea más necesario:
+    try:
     # Reunificamos palabras partidas por el tokenizador de BERT: "Pa, ##lab ##ra" ---> "Palabra"
-    #z = 0 #Con esta variable, nos ahorramos un chorro de recursos para evitar iterar sobre todo dict_tags una-y-otra-vez.
-    #to_delete = []
-    #for y in dict_tags: # Iterando en orden de aparición
-    #  if y['palabra'][:2] == "##": # Debido a la naturaleza del tokenizador de BERT, esto nunca se alcanzará en la primera iteración, a menos que un chistocito arruine el programa metiendo un texto que inicie con "##".
-    #    try: # Sólo podría fallar en la primera iteración del for.
-    #      y['palabra'] = z['palabra'] + y['palabra'][2:] # Reunificamos la palabra.
-    #    except:
-    #      raise Exception("Un chistosito pensó que sería divertido iniciar su reporte con '##'. Soluciónalo eliminando dichos caracteres especiales del inicio.")
-    #    y['start'] = z['start'] # Ahora el inicio de la palabra será el inicio de la primera mitad.
-    #    to_delete.append(z) #Borraremos este z ya que y ha tomado su lugar.
-    #    z = y # Considerando el caso de que una palabra se divida en más de dos partes. IMPORTANTE QUE SE EJECUTE HASTA LO ÚLTIMO DE LA ITERACIÓN.
-    #  else:
-    #    z = y
-    #for x in to_delete:
-    #  dict_tags.remove(x)
+      z = 0 #Con esta variable, nos ahorramos un chorro de recursos para evitar iterar sobre todo dict_tags una-y-otra-vez.
+      to_delete = []
+      for y in dict_tags: # Iterando en orden de aparición
+        if y['palabra'][:2] == "##": # Debido a la naturaleza del tokenizador de BERT, esto nunca se alcanzará en la primera iteración, a menos que un chistocito arruine el programa metiendo un texto que inicie con "##".
+          try: # Sólo podría fallar en la primera iteración del for.
+            y['palabra'] = z['palabra'] + y['palabra'][2:] # Reunificamos la palabra.
+          except:
+            raise Exception("Un chistosito pensó que sería divertido iniciar su reporte con '##'. Soluciónalo eliminando dichos caracteres especiales del inicio.")
+          y['start'] = z['start'] # Ahora el inicio de la palabra será el inicio de la primera mitad.
+          to_delete.append(z) #Borraremos este z ya que y ha tomado su lugar.
+          z = y # Considerando el caso de que una palabra se divida en más de dos partes. IMPORTANTE QUE SE EJECUTE HASTA LO ÚLTIMO DE LA ITERACIÓN.
+        else:
+          z = y
+      for x in to_delete:
+        dict_tags.remove(x)
+    except:
+      self.tags = self.alt_nlp(texto)
+      dict_tags = []
+      for targ in dict_tag:
+        dict_tags += [{'tag':targ, 'palabra':x['word'], 'start':x['start'],'end':x['end'], 'index':x['index']} for x in self.tags if x['entity_group'] in dict_tag[targ]] # self.tags se define en otras funciones, y consiste en el resultado del BERT-NERTagger ya ejecutado sobre el texto.
+      dict_tags = sorted(dict_tags, key=lambda x: x["index"]) #Ordenados por orden de aparición.
 
     final_tags = {'tag':[x['tag'] for x in dict_tags], 'palabra':[x['palabra'] for x in dict_tags], 'start':[x['start'] for x in dict_tags],'end':[x['end'] for x in dict_tags]} # dict_tags pero sin el index de token y en formato de DataFrame.
 
@@ -138,6 +146,8 @@ class NER_tagger:
         transf_tags[(str(lugares_tag))] = ['B-LOC','I-LOC']
       if nombres_tag:
         transf_tags[(str(nombres_tag))] = ['B-ORG','B-PER','I-ORG','I-PER']
+
+
       if len(transf_tags) > 0:
         trans_tags = self.tag_transformer(texto, transf_tags) #Descartados por ahora: 'B-MISC','I-MISC',
       else:
